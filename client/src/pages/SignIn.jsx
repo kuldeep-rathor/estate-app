@@ -1,11 +1,104 @@
-import React from 'react'
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 
 const SignIn = () => {
-  return (
-    <div>
-      SignIn
-    </div>
-  )
-}
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-export default SignIn
+  const validationSchema = Yup.object({
+    email: Yup.string().email("Invalid email address"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+      setLoading(false);
+      setError(null);
+      navigate("/");
+    } catch (err) {
+      setLoading(false);
+      setError(err.message);
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="p-3 max-w-lg mx-auto">
+      <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, touched }) => (
+          <Form className="flex flex-col gap-4">
+            <div>
+              <Field
+                type="email"
+                placeholder="Email"
+                className="border p-3 rounded-lg w-full"
+                name="email"
+                id="email"
+              />
+              {errors.email && touched.email && (
+                <div className="text-red-500 text-sm mt-1">{errors.email}</div>
+              )}
+            </div>
+
+            <div>
+              <Field
+                type="password"
+                placeholder="Password"
+                className="border p-3 rounded-lg w-full"
+                name="password"
+                id="password"
+              />
+              {errors.password && touched.password && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.password}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95
+              disabled:opacity-80"
+            >
+              {loading ? "Loading..." : "Sign-In"}
+            </button>
+          </Form>
+        )}
+      </Formik>
+
+      <div className="flex gap-2 mt-5">
+        <p>Dont Have an Account?</p>
+        <Link to="/sign-up">
+          <span className="text-blue-700">Sign-Up</span>
+        </Link>
+      </div>
+      {error && <p className="text-red-500 mt-5">{error}</p>}
+    </div>
+  );
+};
+
+export default SignIn;
