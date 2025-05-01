@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import OAuth from "../components/OAuth";
 
 const SignUp = () => {
   const [error, setError] = useState(null);
@@ -112,6 +113,7 @@ const SignUp = () => {
             >
               {loading ? "Loading..." : "Sign-Up"}
             </button>
+            <OAuth />
           </Form>
         )}
       </Formik>
