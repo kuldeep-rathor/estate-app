@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import {
   getDownloadURL,
@@ -63,7 +64,7 @@ const Profile = () => {
         <img
           onClick={() => fileRef.current.click()}
           accept="image/*"
-          src={formData.avatar || currentUser?.avatar}
+          src={formData.avatar || currentUser?.rest.avatar}
           alt="Profile Icon"
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
